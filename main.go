@@ -10,6 +10,8 @@ import (
 
 func main() {
 	app := cli.NewApp()
+	app.Name = "par"
+	app.Usage = "fight the loneliness!"
 
 	app.Action = func(c *cli.Context) error {
 		fileNames := strings.Split(c.Args().Get(0), ",")

@@ -5,9 +5,9 @@ import (
 	"path"
 	"strings"
 
-	"fmt"
-
 	"io/ioutil"
+
+	"fmt"
 
 	"github.com/smallfish/simpleyaml"
 	"github.com/urfave/cli"
@@ -38,6 +38,24 @@ func ParseFileData(filenames []string, ymlPathArgs []string) [][]string {
 	return envKeys
 }
 
+func CompareEnvArrays(envKeys [][]string) bool {
+	for i := 0; i < len(envKeys); i++ {
+		for j := i + 1; j < len(envKeys); j++ {
+			if len(envKeys[i]) != len(envKeys[j]) {
+				fmt.Println("Unequal number of keys")
+				return false
+			}
+			for y := 0; y < len(envKeys[j]); y++ {
+				if envKeys[j][y] != envKeys[i][y] {
+					fmt.Println("A key exists in one file, that another one doesn't have")
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
 func appendStringsToCWD(filenames []string) []string {
 	pwd, _ := os.Getwd()
 	for index, file := range filenames {
@@ -53,9 +71,15 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 		fileNames := strings.Split(c.Args().Get(0), ",")
-		ymlArgs := strings.Split(c.Args().Get(0), ",")
+		ymlArgs := strings.Split(c.Args().Get(1), ",")
 		envKeys := ParseFileData(fileNames, ymlArgs)
-		fmt.Println(envKeys)
+		result := CompareEnvArrays(envKeys)
+		if result {
+			os.Exit(0)
+		} else {
+			fmt.Println("Keys arent equal")
+			os.Exit(1)
+		}
 		return nil
 	}
 

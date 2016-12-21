@@ -22,14 +22,16 @@ func TestParseData(t *testing.T) {
 
 func TestComparingArraysThatAreEqual(t *testing.T) {
 	expectedValues := [][]string{}
+	fileNames := []string{"testfiles/data1.yml", "testfiles/data2.yml"}
 
 	// These are the first two rows.
 	row1 := []string{"a", "b"}
 	row2 := []string{"a", "b"}
+
 	expectedValues = append(expectedValues, row1)
 	expectedValues = append(expectedValues, row2)
 
-	testArraysAreEqual := CompareEnvArrays(expectedValues)
+	testArraysAreEqual := CompareEnvArrays(expectedValues, fileNames)
 	assert.Equal(t, true, testArraysAreEqual)
 }
 
@@ -39,10 +41,12 @@ func TestComparingArraysThatArentEqualByKeys(t *testing.T) {
 	// These are the first two rows.
 	row1 := []string{"a", "c"}
 	row2 := []string{"a", "b"}
+	fileNames := []string{"testfiles/data1.yml", "testfiles/data2.yml"}
+
 	expectedValues = append(expectedValues, row1)
 	expectedValues = append(expectedValues, row2)
 
-	testArraysAreEqual := CompareEnvArrays(expectedValues)
+	testArraysAreEqual := CompareEnvArrays(expectedValues, fileNames)
 	assert.Equal(t, false, testArraysAreEqual)
 }
 
@@ -52,9 +56,11 @@ func TestComparingArraysThatArentEqualByLength(t *testing.T) {
 	// These are the first two rows.
 	row1 := []string{"a", "b", "c"}
 	row2 := []string{"a", "b"}
+	fileNames := []string{"testfiles/data1.yml", "testfiles/data2.yml"}
+
 	expectedValues = append(expectedValues, row1)
 	expectedValues = append(expectedValues, row2)
 
-	testArraysAreEqual := CompareEnvArrays(expectedValues)
+	testArraysAreEqual := CompareEnvArrays(expectedValues, fileNames)
 	assert.Equal(t, false, testArraysAreEqual)
 }

@@ -58,7 +58,7 @@ func CompareEnvArrays(envKeys [][]string, filenames []string) bool {
 				}
 				if !keyExists {
 					fmt.Println("Key " + envKeys[j][y] + " doesn't exist in file parameter " + filenames[j])
-					os.Exit(1)
+					return false
 				}
 			}
 		}

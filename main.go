@@ -32,13 +32,17 @@ func extractKeys(fileData []byte, ymlPathArgs []string) []string {
 func ParseFileData(filenames []string, ymlPathArgs []string) [][]string {
 	envKeys := make([][]string, 0, 50)
 	for _, file := range filenames {
+		if _, err := os.Stat(file); os.IsNotExist(err) {
+			fmt.Println(file + " Does not exist")
+			os.Exit(1)
+		}
 		fileData, _ := ioutil.ReadFile(file)
 		envKeys = append(envKeys, extractKeys(fileData, ymlPathArgs))
 	}
 	return envKeys
 }
 
-func CompareEnvArrays(envKeys [][]string) bool {
+func CompareEnvArrays(envKeys [][]string, filenames []string) bool {
 	for i := 0; i < len(envKeys); i++ {
 		for j := i + 1; j < len(envKeys); j++ {
 			if len(envKeys[i]) != len(envKeys[j]) {
@@ -46,9 +50,15 @@ func CompareEnvArrays(envKeys [][]string) bool {
 				return false
 			}
 			for y := 0; y < len(envKeys[j]); y++ {
-				if envKeys[j][y] != envKeys[i][y] {
-					fmt.Println("A key exists in one file, that another one doesn't have")
-					return false
+				keyExists := false
+				for z := 0; z < len(envKeys[j]); z++ {
+					if envKeys[j][y] == envKeys[i][z] {
+						keyExists = true
+					}
+				}
+				if !keyExists {
+					fmt.Println("Key " + envKeys[j][y] + " doesn't exist in file parameter " + filenames[j])
+					os.Exit(1)
 				}
 			}
 		}
@@ -73,8 +83,9 @@ func main() {
 		fileNames := strings.Split(c.Args().Get(0), ",")
 		ymlArgs := strings.Split(c.Args().Get(1), ",")
 		envKeys := ParseFileData(fileNames, ymlArgs)
-		result := CompareEnvArrays(envKeys)
+		result := CompareEnvArrays(envKeys, fileNames)
 		if result {
+			fmt.Println("All configs are matching")
 			os.Exit(0)
 		} else {
 			fmt.Println("Keys arent equal")

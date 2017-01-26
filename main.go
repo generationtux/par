@@ -15,8 +15,13 @@ import (
 
 func extractKeys(fileData []byte, ymlPathArgs []string) []string {
 	keys := make([]string, 0, 50)
-	y, _ := simpleyaml.NewYaml(fileData)
-	data, _ := y.GetPath(ymlPathArgs...).String()
+	data := ""
+	if len(ymlPathArgs) > 0 {
+		y, _ := simpleyaml.NewYaml(fileData)
+		data, _ = y.GetPath(ymlPathArgs...).String()
+	} else {
+		data = string(fileData[:])
+	}
 	lines := strings.Split(data, "\n")
 	for _, line := range lines {
 		keyVals := strings.Split(line, "=")
@@ -81,7 +86,11 @@ func main() {
 
 	app.Action = func(c *cli.Context) error {
 		fileNames := strings.Split(c.Args().Get(0), ",")
-		ymlArgs := strings.Split(c.Args().Get(1), ",")
+		ymlArgs := []string{}
+		cmdArgs := c.Args().Get(1)
+		if cmdArgs != "" {
+			ymlArgs = strings.Split(c.Args().Get(1), ",")
+		}
 		envKeys := ParseFileData(fileNames, ymlArgs)
 		result := CompareEnvArrays(envKeys, fileNames)
 		if result {
